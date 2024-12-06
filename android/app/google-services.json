@@ -12,7 +12,20 @@
           "package_name": "com.xd.login"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "130330927832-40v67ft2ukpc7ap5380nu3cqvol59r47.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.xd.login",
+            "certificate_hash": "eebc0eef769aee5e3c86b457c426ba227625273d"
+          }
+        },
+        {
+          "client_id": "130330927832-36hp3js0uee7hl222phjmv8fk1g46t5v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCO2oHmm0UFnSyQsKFGMsPraR0AEpwzezc"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "130330927832-36hp3js0uee7hl222phjmv8fk1g46t5v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "130330927832-oh935v5ftclan9gbllbqk5p8dpr3soqv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.xd.login"
+              }
+            }
+          ]
         }
       }
     }

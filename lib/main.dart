@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
+import 'login_util.dart';
 
 Future<void> main() async {
   // main函数中有await时，需要先调用此方法否则会有警告
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'GoogleAndAppleLogin',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -57,21 +59,31 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+            ElevatedButton(
+              onPressed: () async {
+                // 登录按钮点击事件
+                print('Google login clcik');
+                var user = LoginUtil.currentUser();
+                if (user != null) {
+                  print("user== $user");
+                  await LoginUtil.signOut();
+                }
+                String? token = await LoginUtil.signInWithGoogle();
+                print("token== $token");
+              },
+              child: const Text('Google登录'),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+           const SizedBox(height: 16), // 按钮之间的间距
+            ElevatedButton(
+              onPressed: () {
+                // 注册按钮点击事件
+                print('Apple login clcik');
+              },
+              child: const Text('Apple登录'),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "130330927832",
+    "project_id": "login-10aad",
+    "storage_bucket": "login-10aad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130330927832:android:dbfd716d63293e90ddedad",
+        "android_client_info": {
+          "package_name": "com.xd.login"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCO2oHmm0UFnSyQsKFGMsPraR0AEpwzezc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

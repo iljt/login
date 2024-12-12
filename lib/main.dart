@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
@@ -49,7 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -73,11 +73,18 @@ class _MyHomePageState extends State<MyHomePage> {
               },
               child: const Text('Google登录'),
             ),
-           const SizedBox(height: 16), // 按钮之间的间距
+            const SizedBox(height: 16), // 按钮之间的间距
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // 注册按钮点击事件
-                print('Apple login clcik');
+                print('Google login clcik');
+                var user = LoginUtil.currentUser();
+                if (user != null) {
+                  print("user== $user");
+                  await LoginUtil.signOut();
+                }
+                String? token = await LoginUtil.signInWithApple();
+                print("token== $token");
               },
               child: const Text('Apple登录'),
             ),

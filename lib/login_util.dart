@@ -5,7 +5,7 @@ class LoginUtil {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  /// google登录
+  // google登录
   static Future<String?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
     if (googleUser != null) {
@@ -23,6 +23,16 @@ class LoginUtil {
     }
     return null;
   }
+
+  //Apple登录
+  static Future<String?> signInWithApple() async {
+    final applerProvider = AppleAuthProvider();
+    final auth = await _auth.signInWithProvider(applerProvider);
+    if (auth.user == null) return null;
+    print(auth);
+    IdTokenResult? idTokenResult = await auth.user?.getIdTokenResult(true);
+    return idTokenResult?.token;
+}
 
 
   ///获取当前用户

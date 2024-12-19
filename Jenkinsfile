@@ -17,9 +17,8 @@ pipeline {
 
     environment {
        // PATH = "D:\\flutter\\bin;${env.PATH}" // Windows 路径示例
-        // 动态设置Flutter路径 '/path/to/flutter'需改为macOS上的Flutter SDK 路径，比如 /usr/local/bin/flutter
-        FLUTTER_HOME = isUnix() ? '/path/to/flutter' : 'D:\\flutter\\bin'
-        PATH = "${FLUTTER_HOME};${env.PATH}"
+      // FLUTTER_HOME = isUnix() ? '/path/to/flutter' : 'D:\\flutter\\bin'
+      //  PATH = "${FLUTTER_HOME};${env.PATH}"
         PGY_API_KEY = credentials('pgyer_api_key')
         PGY_USER_KEY = credentials('pgyer_user_key')
     }
@@ -33,6 +32,21 @@ pipeline {
                     branches: [[name: "*/${params.BRANCH_NAME}"]],
                     userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
                 ])
+            }
+        }
+
+       stage('设置 Flutter Sdk Path') {
+            steps {
+                script {
+                   // 动态设置Flutter路径 '/path/to/flutter'需改为macOS上的Flutter SDK 路径，比如 /usr/local/bin/flutter
+                    if (isUnix()) {
+                        env.FLUTTER_HOME = '/path/to/flutter' // macOS/Linux 路径
+                    } else {
+                        env.FLUTTER_HOME = 'D:\\flutter\\bin' // Windows 路径
+                    }
+                    // 更新 PATH 环境变量
+                    env.PATH = "${env.FLUTTER_HOME};${env.PATH}"
+                }
             }
         }
 

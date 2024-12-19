@@ -17,8 +17,6 @@ pipeline {
 
     environment {
        // PATH = "D:\\flutter\\bin;${env.PATH}" // Windows 路径示例
-      // FLUTTER_HOME = isUnix() ? '/path/to/flutter' : 'D:\\flutter\\bin'
-      //  PATH = "${FLUTTER_HOME};${env.PATH}"
         PGY_API_KEY = credentials('pgyer_api_key')
         PGY_USER_KEY = credentials('pgyer_user_key')
     }
@@ -127,7 +125,7 @@ pipeline {
                     def message = [
                         msgtype: "text",
                         text: [
-                            content: "Flutter 应用已打包并上传到蒲公英，下载地址：${buildQRCodeURL}，分支：${params.BRANCH_NAME}，平台：${params.BUILD_PLATFORM}，类型：${params.BUILD_TYPE}"
+                            content: "Flutter 应用已打包并上传到蒲公英，下载地址：${buildQRCodeURL}，分支：${params.BRANCH_NAME}，平台：${params.BUILD_PLATFORM}，类型：${params.BUILD_TYPE}，关键词：package"
                         ]
                     ]
                      // 转换为 JSON 格式

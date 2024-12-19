@@ -16,7 +16,10 @@ pipeline {
     }
 
     environment {
-        PATH = "D:\\flutter\\bin;${env.PATH}" // Windows 路径示例
+       // PATH = "D:\\flutter\\bin;${env.PATH}" // Windows 路径示例
+        // 动态设置Flutter路径 '/path/to/flutter'需改为macOS上的Flutter SDK 路径，比如 /usr/local/bin/flutter
+        FLUTTER_HOME = isUnix() ? '/path/to/flutter' : 'D:\\flutter\\bin'
+        PATH = "${FLUTTER_HOME};${env.PATH}"
         PGY_API_KEY = credentials('pgyer_api_key')
         PGY_USER_KEY = credentials('pgyer_user_key')
     }
@@ -77,6 +80,7 @@ pipeline {
                 script {
                     if (params.BUILD_PLATFORM == 'android') {
                         def apkPath = "build/app/outputs/flutter-apk/app-${params.BUILD_TYPE}.apk"
+                        // 将上传结果存储到环境变量
                         env.UPLOAD_RESPONSE = sh(
                             script: """
                             curl -F "file=@${apkPath}" \
@@ -97,18 +101,24 @@ pipeline {
         stage('发送钉钉通知') {
             steps {
                 script {
+                    // 使用 Groovy 的 JsonSlurper 解析 JSON 响应
+                    //Jenkins 需要安装 Pipeline Utility Steps 插件才能使用 readJSON 步骤
                     def jsonResponse = readJSON text: env.UPLOAD_RESPONSE
                     def buildQRCodeURL = jsonResponse.data.buildQRCodeURL
                     echo "蒲公英下载地址: $buildQRCodeURL"
 
-                    def webhookUrl = "https://oapi.dingtalk.com/robot/send?access_token=你的钉钉机器人Token"
+                    // 钉钉通知消息
+                    def webhookUrl = "https://oapi.dingtalk.com/robot/send?access_token=3f097c4f1f749329a795bc0e23e40b101f3b0168e837dfd86de1e77df440660a"
+                    // 构建消息内容
                     def message = [
                         msgtype: "text",
                         text: [
                             content: "Flutter 应用已打包并上传到蒲公英，下载地址：${buildQRCodeURL}，分支：${params.BRANCH_NAME}，平台：${params.BUILD_PLATFORM}，类型：${params.BUILD_TYPE}"
                         ]
                     ]
+                     // 转换为 JSON 格式
                     def messageJson = groovy.json.JsonOutput.toJson(message)
+                    // 发送 HTTP 请求
                     sh """
                         curl -X POST -H 'Content-Type: application/json; charset=UTF-8' \
                              -d '${messageJson}' \

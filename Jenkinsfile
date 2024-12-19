@@ -3,7 +3,7 @@ pipeline {
 
     parameters {
         // 分支选择下拉菜单
-        choice(name: 'BRANCH_NAME', choices: ['master', 'develop', 'feature-branch'], description: '请选择需要构建的分支')
+        choice(name: 'BRANCH_NAME', choices: ['master', 'dev'], description: '请选择需要构建的分支')
 
         // 构建平台选择下拉菜单
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
@@ -12,7 +12,7 @@ pipeline {
         choice(name: 'BUILD_TYPE', choices: ['release', 'debug'], description: '请选择构建类型')
 
         // 可选：Flutter 构建参数
-        string(name: 'FLUTTER_BUILD_ARGS', defaultValue: '', description: '请输入Flutter构建参数（例如：--target-platform=android-arm64）')
+        string(name: 'FLUTTER_BUILD_ARGS', defaultValue: '', description: '请输入Flutter构建参数（例如：--target-platform android-arm,android-arm64）')
     }
 
     environment {
@@ -22,7 +22,7 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+        stage('从Git Checkout') {
             steps {
                 // 使用选择的分支进行拉取
                 checkout([
@@ -33,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('打包Build') {
             steps {
                 dir('login') {
                     // 安装 Flutter 依赖
@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-        stage('Archive') {
+        stage('归档Archive') {
             steps {
                 // 归档 APK 或 iOS 包文件
                 script {
@@ -76,7 +76,7 @@ pipeline {
             steps {
                 script {
                     if (params.BUILD_PLATFORM == 'android') {
-                        def apkPath = 'build/app/outputs/flutter-apk/app-${params.BUILD_TYPE}.apk'
+                        def apkPath = "build/app/outputs/flutter-apk/app-${params.BUILD_TYPE}.apk"
                         env.UPLOAD_RESPONSE = sh(
                             script: """
                             curl -F "file=@${apkPath}" \

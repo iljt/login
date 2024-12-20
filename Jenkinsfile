@@ -23,7 +23,10 @@ pipeline {
         choice(name: 'BUILD_TYPE', choices: ['release', 'debug'], description: '请选择构建类型')
         string(name: 'FLUTTER_BUILD_ARGS', defaultValue: '', description: '请输入Flutter构建参数（例如：--target-platform android-arm,android-arm64）')
         // 新增参数：描述此次打包的内容描述
-        string(name: 'BUILD_DESCRIPTION', defaultValue: '', description: '请输入此次打包的内容描述（例如：1、修改xxbug\n2、增加推送功能）')
+        //text 类型参数会显示一个多行输入框
+        text(name: 'BUILD_DESCRIPTION',
+                defaultValue: '',
+                description: '请输入此次打包的内容描述（例如：1、修改xxbug 2、增加推送功能）')
     }
 
     stages {
@@ -135,7 +138,7 @@ pipeline {
                     def message = [
                         msgtype: "text",
                         text: [
-                            content: "Flutter 应用已打包并上传到蒲公英，下载地址：${buildQRCodeURL}\n分支：${env.BRANCH_NAME}\n平台：${env.BUILD_PLATFORM}\n打包类型：${env.BUILD_TYPE}\n此次打包内容描述：${params.BUILD_DESCRIPTION}\n 关键词：package"
+                            content: "Flutter 应用已打包并上传到蒲公英，下载地址：${buildQRCodeURL}\n分支：${env.BRANCH_NAME}\n平台：${env.BUILD_PLATFORM}\n打包类型：${env.BUILD_TYPE}\n此次打包内容描述：${params.BUILD_DESCRIPTION}\n关键词：package"
                         ]
                     ]
                     def messageJson = groovy.json.JsonOutput.toJson(message)

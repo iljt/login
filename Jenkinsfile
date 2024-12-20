@@ -2,6 +2,9 @@ pipeline {
     agent any
 
     parameters {
+        // 分支选择下拉菜单
+        choice(name: 'BRANCH_NAME', choices: ['master', 'dev'], description: '请选择需要构建的分支')
+
         // 构建平台选择下拉菜单
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
 
@@ -19,45 +22,15 @@ pipeline {
     }
 
     stages {
-          stage('获取远程分支列表') {
-               steps {
-                     script {
-                             // 获取远程分支列表并去除 HEAD
-                          def branches = sh(script: "git branch -r | sed 's/origin\\///' | grep -v 'HEAD' | sort", returnStdout: true).trim().split("\n")
-
-                          // 确保分支列表至少有一个分支
-                          if (branches.isEmpty()) {
-                              error("没有找到远程分支")
-                          }
-
-                          // 设置默认分支
-                          def defaultBranch = branches[0]
-
-                          // 让用户选择分支
-                          def selectedBranch = input(
-                                 message: '请选择需要构建的分支',
-                                 parameters: [
-                                     // 动态生成分支选择框
-                                     choice(name: 'BRANCH_NAME', choices: branches, description: '选择一个分支进行构建')
-                                 ]
-                          )
-
-                             // 设置环境变量 BRANCH_NAME
-                          env.BRANCH_NAME = selectedBranch
-                          echo "选中的分支是: ${env.BRANCH_NAME}"
-                      }
-                 }
-             }
-
-         stage('从Git Checkout') {
-                 steps {
-                     // 使用动态获取的分支名进行检出
-                     checkout([
-                         $class: 'GitSCM',
-                         branches: [[name: "*/${env.BRANCH_NAME}"]],
-                         userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
-                     ])
-                 }
+        stage('从Git Checkout') {
+            steps {
+                // 使用选择的分支进行拉取
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${params.BRANCH_NAME}"]],
+                    userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
+                ])
+            }
         }
 
        stage('设置 Flutter Sdk Path') {

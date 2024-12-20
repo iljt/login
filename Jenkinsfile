@@ -7,12 +7,13 @@ pipeline {
     }
 
     parameters {
+        // Git 参数 - 获取所有分支
         gitParameter name: 'BRANCH_NAME',
-                         type: 'PT_BRANCH',
-                         defaultValue: 'master',
-                         description: '选择构建的 Git 分支',
-                         branchFilter: 'origin/*',  // 获取所有分支
-                         sortMode: 'ASCENDING'
+                     type: 'PT_BRANCH',
+                     defaultValue: 'master',
+                     description: '选择构建的 Git 分支',
+                     branchFilter: 'origin/*',  // 获取所有远程分支
+                     sortMode: 'ASCENDING'  // 按字母升序排序
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
         choice(name: 'BUILD_TYPE', choices: ['release', 'debug'], description: '请选择构建类型')
         string(name: 'FLUTTER_BUILD_ARGS', defaultValue: '', description: '请输入Flutter构建参数（例如：--target-platform android-arm,android-arm64）')
@@ -20,26 +21,18 @@ pipeline {
 
     stages {
 
-     stage('获取分支列表') {
-                steps {
-                    script {
-                        // Checkout 选中的 Git 分支
-                        git branch: "${params.BRANCH_NAME}",
-                             url: 'git@github.com:iljt/login.git'  // 使用提供的 Git 仓库地址
-                    }
-                }
-       }
-
+        // 检出分支
         stage('从Git Checkout') {
             steps {
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: "*/${env.BRANCH_NAME}"]],
+                    branches: [[name: "*/${params.BRANCH_NAME}"]],
                     userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
                 ])
             }
         }
 
+        // 设置 Flutter SDK 路径
         stage('设置 Flutter Sdk Path') {
             steps {
                 script {
@@ -53,6 +46,7 @@ pipeline {
             }
         }
 
+        // Flutter 构建
         stage('打包Build') {
             steps {
                 dir('login') {
@@ -77,6 +71,7 @@ pipeline {
             }
         }
 
+        // 归档构建产物
         stage('归档Archive') {
             steps {
                 script {
@@ -89,6 +84,7 @@ pipeline {
             }
         }
 
+        // 上传到蒲公英
         stage('上传到蒲公英') {
             steps {
                 script {
@@ -121,6 +117,7 @@ pipeline {
             }
         }
 
+        // 发送钉钉通知
         stage('发送钉钉通知') {
             steps {
                 script {

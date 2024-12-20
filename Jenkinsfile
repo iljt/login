@@ -23,11 +23,16 @@ pipeline {
 
         stage('从Git Checkout') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "*/${params.BRANCH_NAME}"]],
-                    userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
-                ])
+               script {
+                       // 拉取所有远程分支
+                       sh 'git fetch --all'
+                       // 然后进行 Git Checkout
+                       checkout([
+                            $class: 'GitSCM',
+                            branches: [[name: "*/${params.BRANCH_NAME}"]],
+                            userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
+                       ])
+                      }
             }
         }
 

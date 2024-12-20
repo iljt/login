@@ -20,6 +20,16 @@ pipeline {
 
     stages {
 
+     stage('获取分支列表') {
+                steps {
+                    script {
+                        // Checkout 选中的 Git 分支
+                        git branch: "${params.BRANCH_NAME}",
+                             url: 'git@github.com:iljt/login.git'  // 使用提供的 Git 仓库地址
+                    }
+                }
+       }
+
         stage('从Git Checkout') {
             steps {
                 checkout([

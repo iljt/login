@@ -22,27 +22,38 @@ pipeline {
     }
 
     stages {
+          stage('获取远程分支列表') {
+               steps {
+                     script {
+                             // 获取远程分支列表并去除 HEAD
+                          def branches = sh(script: "git branch -r | sed 's/origin\\///' | grep -v 'HEAD' | sort", returnStdout: true).trim().split("\n")
+
+                          // 确保分支列表至少有一个分支
+                          if (branches.isEmpty()) {
+                              error("没有找到远程分支")
+                          }
+
+                          // 设置默认分支
+                          def defaultBranch = branches[0]
+
+                          // 让用户选择分支
+                          def selectedBranch = input(
+                                 message: '请选择需要构建的分支',
+                                 parameters: [
+                                     // 动态生成分支选择框
+                                     choice(name: 'BRANCH_NAME', choices: branches, description: '选择一个分支进行构建')
+                                 ]
+                          )
+
+                             // 设置环境变量 BRANCH_NAME
+                          env.BRANCH_NAME = selectedBranch
+                          echo "选中的分支是: ${env.BRANCH_NAME}"
+                      }
+                 }
+             }
+
          stage('从Git Checkout') {
                  steps {
-                     script {
-                         // 获取远程分支列表
-                         def branches = sh(script: "git branch -r | sed 's/origin\\///' | grep -v 'HEAD' | sort", returnStdout: true).trim().split("\n")
-
-                         // 默认分支
-                         def defaultBranch = 'master'
-
-                         // 判断默认分支是否存在
-                         if (branches.contains(defaultBranch)) {
-                             // 使用 env 来设置环境变量
-                             env.BRANCH_NAME = defaultBranch
-                         } else {
-                             // 否则选择列表中的第一个分支
-                             env.BRANCH_NAME = branches[0]
-                         }
-
-                         echo "选择的分支: ${env.BRANCH_NAME}"
-                     }
-
                      // 使用动态获取的分支名进行检出
                      checkout([
                          $class: 'GitSCM',
@@ -50,7 +61,7 @@ pipeline {
                          userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
                      ])
                  }
-       }
+        }
 
        stage('设置 Flutter Sdk Path') {
             steps {

@@ -7,51 +7,18 @@ pipeline {
     }
 
     parameters {
+        gitParameter name: 'BRANCH_NAME',
+                         type: 'PT_BRANCH',
+                         defaultValue: 'main',
+                         description: '选择构建的 Git 分支',
+                         branchFilter: 'origin/*',  // 获取所有分支
+                         sortMode: 'ASCENDING'
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
         choice(name: 'BUILD_TYPE', choices: ['release', 'debug'], description: '请选择构建类型')
         string(name: 'FLUTTER_BUILD_ARGS', defaultValue: '', description: '请输入Flutter构建参数（例如：--target-platform android-arm,android-arm64）')
     }
 
     stages {
-        stage('获取分支列表') {
-            steps {
-                script {
-                    // 获取分支列表
-                    def branchList = []
-                    if (fileExists('branch_list.txt')) {
-                        // 如果文件已经存在，读取文件内容
-                        branchList = readFile('branch_list.txt').split('\n')
-                    } else {
-                        // 如果文件不存在，则通过 Git 获取分支列表
-                        branchList = sh(script: 'git ls-remote --heads git@github.com:iljt/login.git', returnStdout: true)
-                            .split('\n')
-                            .collect { it.split()[1].replaceAll('refs/heads/', '') }
-                            .findAll { it != 'master' && it != 'dev' } // 排除默认的分支 master 和 dev
-                        // 将分支列表写入文件，方便下次使用
-                        writeFile file: 'branch_list.txt', text: branchList.join('\n')
-                    }
-                    // 将分支列表加入环境变量以供后续步骤使用
-                    env.BRANCH_LIST = branchList.join(',')
-                    echo "Branch List: ${env.BRANCH_LIST}"
-                }
-            }
-        }
-
-        stage('选择构建分支') {
-            steps {
-                script {
-                    def branchList = env.BRANCH_LIST.split(',')
-                    def branchChoice = input(
-                        message: '请选择需要构建的分支',
-                        parameters: [
-                            choice(name: 'BRANCH_NAME', choices: ['master', 'dev'] + branchList, description: '请选择需要构建的分支')
-                        ]
-                    )
-                    env.BRANCH_NAME = branchChoice
-                    echo "Selected Branch: ${env.BRANCH_NAME}"
-                }
-            }
-        }
 
         stage('从Git Checkout') {
             steps {

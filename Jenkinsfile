@@ -24,7 +24,7 @@ pipeline {
     stages {
         stage('从Git Checkout') {
             steps {
-             script {
+              script {
                // 动态获取 Git 仓库的所有分支
                def branches = sh(script: "git branch -r | sed 's/origin\\///' | grep -v 'HEAD' | sort", returnStdout: true).trim().split("\n")
 
@@ -37,7 +37,8 @@ pipeline {
                 } else {
                 // 如果默认分支不存在，选择列表中的第一个分支
                  params.BRANCH_NAME = branches[0]
-                 }
+                }
+               }
                 // 使用选择的分支进行拉取
                 checkout([
                     $class: 'GitSCM',

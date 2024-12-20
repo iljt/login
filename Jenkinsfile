@@ -2,8 +2,28 @@ pipeline {
     agent any
 
     parameters {
-        // 分支选择下拉菜单
-        choice(name: 'BRANCH_NAME', choices: ['master', 'dev'], description: '请选择需要构建的分支')
+        // 使用 Git 分支列表来动态生成选择项
+        script {
+            // 从文件读取分支列表，如果文件不存在则从 Git 获取分支列表
+            def branchList = []
+            if (fileExists('branch_list.txt')) {
+                // 如果文件已经存在，读取文件内容
+                branchList = readFile('branch_list.txt').split('\n')
+            } else {
+                // 如果文件不存在，则通过 Git 获取分支列表
+                branchList = sh(script: 'git ls-remote --heads git@github.com:iljt/login.git', returnStdout: true)
+                    .split('\n')
+                    .collect { it.split()[1].replaceAll('refs/heads/', '') }
+                    .findAll { it != 'master' && it != 'dev' } // 排除默认的分支 master 和 dev
+                // 将分支列表写入文件，方便下次使用
+                writeFile file: 'branch_list.txt', text: branchList.join('\n')
+            }
+
+            return branchList
+        }
+
+        // 分支选择下拉菜单，动态填充分支列表
+        choice(name: 'BRANCH_NAME', choices: ['master', 'dev'] + script(), description: '请选择需要构建的分支')
 
         // 构建平台选择下拉菜单
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
@@ -33,7 +53,7 @@ pipeline {
             }
         }
 
-       stage('设置 Flutter Sdk Path') {
+        stage('设置 Flutter Sdk Path') {
             steps {
                 script {
                    // 动态设置Flutter路径 '/path/to/flutter'需改为macOS上的Flutter SDK 路径，比如 /usr/local/bin/flutter

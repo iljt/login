@@ -103,8 +103,19 @@ pipeline {
                             returnStdout: true
                         ).trim()
                         echo "Upload response: ${env.UPLOAD_RESPONSE}"
-                    } else {
-                        echo "iOS 上传到蒲公英的逻辑可以根据实际需求实现"
+                    } else if (params.BUILD_PLATFORM == 'ios') {
+                        def ipaPath = "build/ios/ipa/app-${params.BUILD_TYPE}.ipa"
+                                         // 将上传结果存储到环境变量
+                                         env.UPLOAD_RESPONSE = sh(
+                                             script: """
+                                             curl -F "file=@${ipaPath}" \
+                                                  -F "_api_key=$PGY_API_KEY" \
+                                                  -F "uKey=$PGY_USER_KEY" \
+                                                  https://www.pgyer.com/apiv2/app/upload
+                                             """,
+                                             returnStdout: true
+                                         ).trim()
+                        echo "Upload response: ${env.UPLOAD_RESPONSE}"
                     }
                 }
             }

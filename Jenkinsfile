@@ -7,13 +7,12 @@ pipeline {
     }
 
     parameters {
-        // Git 参数 - 获取所有分支
         gitParameter name: 'BRANCH_NAME',
-                     type: 'PT_BRANCH',
-                     defaultValue: 'master',
-                     description: '选择构建的 Git 分支',
-                     branchFilter: 'origin/*',  // 获取所有远程分支
-                     sortMode: 'ASCENDING'  // 按字母升序排序
+                         type: 'PT_BRANCH',
+                         defaultValue: 'master',
+                         description: '选择构建的 Git 分支',
+                         branchFilter: 'origin/*',  // 获取所有分支
+                         sortMode: 'ASCENDING'
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
         choice(name: 'BUILD_TYPE', choices: ['release', 'debug'], description: '请选择构建类型')
         string(name: 'FLUTTER_BUILD_ARGS', defaultValue: '', description: '请输入Flutter构建参数（例如：--target-platform android-arm,android-arm64）')
@@ -21,7 +20,7 @@ pipeline {
 
     stages {
 
-        // 检出分支
+
         stage('从Git Checkout') {
             steps {
                 checkout([
@@ -32,7 +31,6 @@ pipeline {
             }
         }
 
-        // 设置 Flutter SDK 路径
         stage('设置 Flutter Sdk Path') {
             steps {
                 script {
@@ -46,7 +44,6 @@ pipeline {
             }
         }
 
-        // Flutter 构建
         stage('打包Build') {
             steps {
                 dir('login') {
@@ -71,7 +68,6 @@ pipeline {
             }
         }
 
-        // 归档构建产物
         stage('归档Archive') {
             steps {
                 script {
@@ -84,7 +80,6 @@ pipeline {
             }
         }
 
-        // 上传到蒲公英
         stage('上传到蒲公英') {
             steps {
                 script {
@@ -117,7 +112,6 @@ pipeline {
             }
         }
 
-        // 发送钉钉通知
         stage('发送钉钉通知') {
             steps {
                 script {

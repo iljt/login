@@ -9,7 +9,7 @@ pipeline {
     parameters {
         gitParameter name: 'BRANCH_NAME',
                          type: 'PT_BRANCH',
-                         defaultValue: 'master',
+                         defaultValue: 'main',
                          description: '选择构建的 Git 分支',
                          branchFilter: 'origin/*',  // 获取所有分支
                          sortMode: 'ASCENDING'

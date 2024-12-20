@@ -139,7 +139,7 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            cleanWs deleteDirs: true // 强制删除目录中的所有内容
         }
     }
 }

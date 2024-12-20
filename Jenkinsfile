@@ -7,12 +7,14 @@ pipeline {
     }
 
     parameters {
-        gitParameter name: 'BRANCH_NAME',
+        /* gitParameter name: 'BRANCH_NAME',
                          type: 'PT_BRANCH',
                          defaultValue: 'master',
                          description: '选择构建的 Git 分支',
-                         branchFilter: 'origin/*',  // 获取所有分支
-                         sortMode: 'ASCENDING'
+                         branchFilter: 'origin *//*',  // 获取所有分支
+                         sortMode: 'ASCENDING' */
+        gitParameter branch: '', branchFilter: 'origin/(.*)', defaultValue: 'master', description: '选择构建的 Git 分支', name: 'BRANCH_NAME', quickFilterEnabled: false, selectedValue: 'DEFAULT', sortMode: 'NONE', tagFilter: '*', type: 'PT_BRANCH'
+
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
         choice(name: 'BUILD_TYPE', choices: ['release', 'debug'], description: '请选择构建类型')
         string(name: 'FLUTTER_BUILD_ARGS', defaultValue: '', description: '请输入Flutter构建参数（例如：--target-platform android-arm,android-arm64）')

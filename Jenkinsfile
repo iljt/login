@@ -22,31 +22,35 @@ pipeline {
     }
 
     stages {
-        stage('从Git Checkout') {
-            steps {
-              script {
-               // 动态获取 Git 仓库的所有分支
-               def branches = sh(script: "git branch -r | sed 's/origin\\///' | grep -v 'HEAD' | sort", returnStdout: true).trim().split("\n")
+         stage('从Git Checkout') {
+                 steps {
+                     script {
+                         // 获取远程分支列表
+                         def branches = sh(script: "git branch -r | sed 's/origin\\///' | grep -v 'HEAD' | sort", returnStdout: true).trim().split("\n")
 
-               // 默认选择的分支
-               def defaultBranch = 'master'
+                         // 默认分支
+                         def defaultBranch = 'master'
 
-               // 如果默认分支存在于获取的分支列表中，设置 BRANCH_NAME 参数的默认值为 'master'
-               if (branches.contains(defaultBranch)) {
-                   params.BRANCH_NAME = defaultBranch
-                } else {
-                // 如果默认分支不存在，选择列表中的第一个分支
-                 params.BRANCH_NAME = branches[0]
-                }
-               }
-                // 使用选择的分支进行拉取
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: "*/${params.BRANCH_NAME}"]],
-                    userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
-                ])
-            }
-        }
+                         // 判断默认分支是否存在
+                         if (branches.contains(defaultBranch)) {
+                             // 使用 env 来设置环境变量
+                             env.BRANCH_NAME = defaultBranch
+                         } else {
+                             // 否则选择列表中的第一个分支
+                             env.BRANCH_NAME = branches[0]
+                         }
+
+                         echo "选择的分支: ${env.BRANCH_NAME}"
+                     }
+
+                     // 使用动态获取的分支名进行检出
+                     checkout([
+                         $class: 'GitSCM',
+                         branches: [[name: "*/${env.BRANCH_NAME}"]],
+                         userRemoteConfigs: [[url: 'git@github.com:iljt/login.git']]
+                     ])
+                 }
+       }
 
        stage('设置 Flutter Sdk Path') {
             steps {

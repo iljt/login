@@ -2,9 +2,6 @@ pipeline {
     agent any
 
     parameters {
-        // 分支选择下拉菜单
-        choice(name: 'BRANCH_NAME', choices: [], description: '请选择需要构建的分支')
-
         // 构建平台选择下拉菜单
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
 

@@ -3,7 +3,7 @@ pipeline {
 
     parameters {
         // 分支选择下拉菜单
-        choice(name: 'BRANCH_NAME', choices: ['master', 'dev'], description: '请选择需要构建的分支')
+        choice(name: 'BRANCH_NAME', choices: [], description: '请选择需要构建的分支', defaultValue: 'master')
 
         // 构建平台选择下拉菜单
         choice(name: 'BUILD_PLATFORM', choices: ['android', 'ios'], description: '请选择构建平台')
@@ -24,6 +24,19 @@ pipeline {
     stages {
         stage('从Git Checkout') {
             steps {
+             script {
+                 // 动态获取 Git 仓库的所有分支
+                def branches = sh(script: "git branch -r | sed 's/origin\\///' | grep -v 'HEAD' | sort", returnStdout: true).trim().split("\n")
+                // 默认选择的分支
+                def defaultBranch = 'master'
+                // 如果默认分支存在于获取的分支列表中，设置 BRANCH_NAME 参数的默认值为 'master'
+                if (branches.contains(defaultBranch)) {
+                     currentBuild.rawBuild.addAction(new ParametersAction(new ChoiceParameterDefinition('BRANCH_NAME', branches, '请选择需要构建的分支', defaultBranch)))
+                } else {
+                // 如果默认分支不存在，选择列表中的第一个分支
+                   currentBuild.rawBuild.addAction(new ParametersAction(new ChoiceParameterDefinition('BRANCH_NAME', branches, '请选择需要构建的分支', branches[0])))
+                 }
+                }
                 // 使用选择的分支进行拉取
                 checkout([
                     $class: 'GitSCM',

@@ -26,7 +26,7 @@ pipeline {
         //text 类型参数会显示一个多行输入框
         text(name: 'BUILD_DESCRIPTION',
                 defaultValue: '',
-                description: '请输入此次打包的内容描述（例如：1、修改xxbug 2、增加推送功能）')
+                description: '请输入此次打包的内容描述（例如：1、修复bug 2、增加推送功能）')
     }
 
     stages {
@@ -138,7 +138,7 @@ pipeline {
                     def message = [
                         msgtype: "text",
                         text: [
-                            content: "Flutter 应用已打包并上传到蒲公英，下载地址：${buildQRCodeURL}\n分支：${env.BRANCH_NAME}\n平台：${env.BUILD_PLATFORM}\n打包类型：${env.BUILD_TYPE}\n此次打包内容描述：${params.BUILD_DESCRIPTION}\n关键词：package"
+                            content: "Flutter 应用已打包并上传到蒲公英，下载地址：${buildQRCodeURL}\n关键词：package\n分支：${env.BRANCH_NAME}\n平台：${env.BUILD_PLATFORM}\n打包类型：${env.BUILD_TYPE}\n此次打包内容描述：\n${params.BUILD_DESCRIPTION}"
                         ]
                     ]
                     def messageJson = groovy.json.JsonOutput.toJson(message)

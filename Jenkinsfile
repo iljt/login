@@ -61,9 +61,7 @@ pipeline {
 
         stage('打包Build') {
             steps {
-                dir('login') {
                     sh 'flutter pub get'
-
                     script {
                         if (env.BUILD_PLATFORM == 'android') {
                             if (env.BUILD_TYPE == 'release') {
@@ -79,7 +77,6 @@ pipeline {
                             }
                         }
                     }
-                }
             }
         }
 
